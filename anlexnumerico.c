@@ -908,7 +908,7 @@ int main(int argc,char* args[])
                nuevaLinea = 0;
                //listaLiberaRam(&pila);
                ++unaSolaExp;
-               strcpy(exp, "");
+               strcpy(exp, ""); 
             }
             //printf("Lin %d: %s -> %d\n",numLinea,t.pe->lexema,t.compLex);
             if(t.compLex != -1){
