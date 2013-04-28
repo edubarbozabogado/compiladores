@@ -734,12 +734,24 @@ void insertaDatoEnLaPila( struct NODO **pila, double num )
  
 };
  
+
+int pilaVacia (struct NODO **pila){
+	return (!(*pila)->valor);
+}
+
+void initPila (struct NODO **pila){
+     struct NODO *temp  = (struct NODO *) malloc(sizeof(struct NODO));
+     temp->valor        = 0;
+     temp->puntero      = *pila;
+     *pila              = temp;
+}
  
 // FUNCIÓN QUE EXTRAE EL PRIMER ELEMENTO DE LA PILA Y BORRA EL NODO VACIO:
 double extraeDatoDeLaPila( struct NODO **pila )
 {
     struct NODO *siguiente;
     double resp;
+    //printf("valor en extraeDatoDeLaPila: %d\n",(*pila)->valor);      
  
     // Se copia el valor a la variable que va a ser retornada por la función:
     resp = (*pila)->valor;
@@ -775,6 +787,75 @@ void listaLiberaRam( struct NODO **lista )
 };
 
 
+char* calcularPostfijo(char postfijo[TAMSTACK][TAMSTACK]){
+    struct NODO *pila;
+    double val1, val2;
+    char resultado[100];
+    char resultDoubleString[50];
+    int posf;
+    
+    initPila(&pila);
+    
+    //calcula el resulta de la notacion polaca inversa
+	           for(posf=0; posf<TAMSTACK; posf++){
+                     if(strcmp(postfijo[posf],"\0")!=0){
+                           //printf("aqui.. se procesa %s\n", postfijo[posf]);                             
+                          // Dependiendo de lo leido se hace una operacion u otra:
+                          if(strcmp(postfijo[posf],"+")==0){
+                              // En el caso de la: '+', '-', '*' y '/', se sacan dos valores de la pila, se opera con ellos según el operador elegido y se guarda el resultado en la pila.
+                              val1 = extraeDatoDeLaPila( &pila );
+                              //printf("val1 %f\n", val1);
+                              if(!pilaVacia(&pila)){
+                                  val2 = extraeDatoDeLaPila( &pila );                  
+                                  insertaDatoEnLaPila( &pila, val2 + val1 );                       
+                              }else{
+                                 strcpy(resultado,"Error en la expresion");
+                                 break;                        
+                              } 
+                          }else if(strcmp(postfijo[posf],"-")==0){
+                                val1 = extraeDatoDeLaPila( &pila );
+                                if(!pilaVacia(&pila)){
+                                  val2 = extraeDatoDeLaPila( &pila );                  
+                                  insertaDatoEnLaPila( &pila, val2 - val1 );                       
+                                }else{
+                                  strcpy(resultado,"Error en la expresion");
+                                  break;                        
+                                }
+                                //printf("valor val2 %f\n", val2);
+                          }else if(strcmp(postfijo[posf],"*")==0){
+                                val1 = extraeDatoDeLaPila( &pila );
+                                if(!pilaVacia(&pila)){
+                                  val2 = extraeDatoDeLaPila( &pila );                  
+                                  insertaDatoEnLaPila( &pila, val2 * val1 );                       
+                                }else{
+                                 strcpy(resultado,"Error en la expresion");
+                                 break;                        
+                                }
+                          }else if(strcmp(postfijo[posf],"/")==0){
+                                val1 = extraeDatoDeLaPila( &pila );
+                                if(!pilaVacia(&pila)){
+                                  val2 = extraeDatoDeLaPila( &pila );                  
+                                  insertaDatoEnLaPila( &pila, val2 / val1 );                       
+                                }else{
+                                  strcpy(resultado,"Error en la expresion");
+                                  break;                        
+                                }
+                          }else{
+                                // Se introduce un nuevo dato en la pila:
+                                insertaDatoEnLaPila( &pila, convierteStringToDouble(postfijo[posf]));
+                                //printf("insertar %s\n", postfijo[posf]);      
+                          }   
+                      }else{
+                            // Se imprime por pantalla el ultimo y único elemento de la pila.
+                           sprintf(resultDoubleString, "%f", extraeDatoDeLaPila( &pila )); 
+                           strcpy(resultado, resultDoubleString); 
+                           break;
+                      }      
+               }
+               return resultado;
+               //   
+}
+
 
 /*
 *
@@ -790,14 +871,15 @@ int main(int argc,char* args[])
 	int ptrInfijo = -1;
 	char lexem[TAMLEX];
 	int posf;
-	struct NODO *pila;
-    double val1, val2;
-    int unaSolaExp = 0;
+	int unaSolaExp = 0;
+	char resultado[100];
+	char exp[100];
 	
 	initTabla();
 	initTablaSimbolos();
 	initInfijo();
 	initPostfijo();
+	strcpy(exp, "");
 	
 	if(argc > 1)
 	{
@@ -814,61 +896,30 @@ int main(int argc,char* args[])
                strcpy(infijo[++ptrInfijo],"#");
                strcpy(infijo[++ptrInfijo],"\0");
                in_a_pos(infijo,postfijo);
+               //initPila(&pila);
                //printInfijo(ptrInfijo);
                //printf("*********************\n");
                //printPosfijo();
-	           //calcula el resulta de la notacion polaca inversa
-	           for(posf=0; posf<TAMSTACK; posf++){
-                     if(strcmp(postfijo[posf],"\0")!=0){
-                           //printf("aqui..\n");                             
-                          // Dependiendo de lo leido se hace una operacion u otra:
-                          if(strcmp(postfijo[posf],"+")==0){
-                              // En el caso de la: '+', '-', '*' y '/', se sacan dos valores de la pila, se opera con ellos según el operador elegido y se guarda el resultado en la pila.
-                              val1 = extraeDatoDeLaPila( &pila );
-                              val2 = extraeDatoDeLaPila( &pila );
-                              insertaDatoEnLaPila( &pila, val2 + val1 );                              
-                          }else if(strcmp(postfijo[posf],"-")==0){
-                                val1 = extraeDatoDeLaPila( &pila );
-                                //printf("valor val1 %f\n", val1);
-                                val2 = extraeDatoDeLaPila( &pila );
-                                //printf("valor val2 %f\n", val2);
-                                insertaDatoEnLaPila( &pila, val2 - val1 );
-                          }else if(strcmp(postfijo[posf],"*")==0){
-                                val1 = extraeDatoDeLaPila( &pila );
-                                val2 = extraeDatoDeLaPila( &pila );
-                                insertaDatoEnLaPila( &pila, val2 * val1 );
-                          }else if(strcmp(postfijo[posf],"/")==0){
-                                val1 = extraeDatoDeLaPila( &pila );
-                                val2 = extraeDatoDeLaPila( &pila );
-                                insertaDatoEnLaPila( &pila, val2 / val1 );
-                          }else{
-                                // Se introduce un nuevo dato en la pila:
-                                //printf("insertar %s\n", postfijo[posf]);      
-                                insertaDatoEnLaPila( &pila, convierteStringToDouble(postfijo[posf]));
-                          }   
-                      }else{
-                            // Se imprime por pantalla el ultimo y único elemento de la pila.
-                           printf( "El resultado es: %f\n", extraeDatoDeLaPila( &pila ) /*pila->valor*/ );           
-                           break;
-                      }      
-               }
-               
-               // 
+	           strcpy(resultado,calcularPostfijo(postfijo));
+	           printf("El resultado de la expresion (%s) es: %s\n", exp, resultado);
                initInfijo();
                ptrInfijo = -1;
                initPostfijo();
                nuevaLinea = 0;
                //listaLiberaRam(&pila);
                ++unaSolaExp;
+               strcpy(exp, "");
             }
             //printf("Lin %d: %s -> %d\n",numLinea,t.pe->lexema,t.compLex);
             if(t.compLex != -1){
+               strcat(exp, t.pe->lexema);                                               
                if(esNroNotacionCientifica(t.pe->lexema, strlen(t.pe->lexema))){                                    
                    //sprintf(DString,"%lf",D);
                    sprintf(lexem,"%lf",convierteStringToDouble(t.pe->lexema));                                     
-                   strcpy(infijo[++ptrInfijo],lexem);                                     
+                   strcpy(infijo[++ptrInfijo],lexem);
                }else{
                    strcpy(infijo[++ptrInfijo],t.pe->lexema);
+                   //printf("lexema %s \n", t.pe->lexema);
                }          
             }
 		}
