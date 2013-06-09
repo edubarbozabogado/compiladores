@@ -722,6 +722,7 @@ int main(int argc,char* args[])
 		printf("Debe pasar como parametro el path al archivo fuente.\n");
 		exit(1);
 	}
-
+ 
+    system("pause"); 
 	return 0;
 }
