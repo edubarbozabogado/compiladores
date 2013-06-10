@@ -82,6 +82,7 @@ char id[TAMLEX];		// Utilizado por el analizador lexico
 int delantero=-1;		// Utilizado por el analizador lexico
 int fin=0;				// Utilizado por el analizador lexico
 int numLinea=1;			// Numero de Linea
+char msg[60];
 
 /************** Prototipos *********************/
 
@@ -683,7 +684,6 @@ void sigLex()
 
 //metodos del analisis sintactico
 void match(token expectedToken){
-     char msg[60];
      if(t.compLex == expectedToken.compLex){
          sigLex();         
      }else{
@@ -707,7 +707,6 @@ void lista_identificadores_prima(){
 //lista identificadores
 void lista_identificadores(){
      token tListaIdent;
-     char msg[60];
      if(t.compLex == ID){    
         tListaIdent.pe=buscar(t.pe->lexema);
         tListaIdent.compLex=t.pe->compLex;
@@ -743,7 +742,6 @@ void lista_declaracion_prima(){
 
 //una sola declaracion
 void unaDeclaracion(){
-     char msg[60];
      if(t.compLex == ID){
           lista_identificadores();
      }
@@ -751,7 +749,6 @@ void unaDeclaracion(){
 
 //metodo de lista de declaracion de variables
 void lista_declaracion(){
-     char msg[60];
      if(t.compLex == ID){
         unaDeclaracion();
         lista_declaracion_prima();                       
@@ -767,9 +764,11 @@ void declaracion(){
           tDec.compLex=VAR;
           match(tDec);
           lista_declaracion();
-          //printf("en declaracion\n");   
      }
-     
+     if(strcmp(msg, "") == 0){
+         printf("Sintaxis de declaracion correcta!.\n");
+         //system("pause"); 
+     }
 }
 
 
@@ -777,6 +776,7 @@ int main(int argc,char* args[])
 {
 	// inicializar analizador lexico
 	int complex=0;
+	strcpy(msg,""); //inicialmente, el mensaje de error de analisis sintactico
 
 	initTabla();
 	initTablaSimbolos();
