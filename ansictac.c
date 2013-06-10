@@ -723,7 +723,7 @@ void lista_identificadores(){
                  break;
             }
          }
-     }
+     } 
 }
 
 void lista_declaracion_prima(){
