@@ -1,1 +1,7 @@
+Integrante
 - Luis Eduardo Barboza Bogado
+
+
+El trabajo de analisis sintactico funciona solo para declaracion de variables.
+- Se entrego el BNF
+- Se entrego el lexer.
